@@ -1,8 +1,15 @@
 package com.smart.academy.service.impl;
 
-import com.smart.academy.service.PersonService;
 import com.smart.academy.domain.Person;
 import com.smart.academy.repository.PersonRepository;
+import com.smart.academy.service.PersonService;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
@@ -11,7 +18,6 @@ import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
 import net.sf.jasperreports.export.SimpleXlsxReportConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,21 +30,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 /**
  * Service Implementation for managing {@link Person}.
  */
 @Service
 @Transactional
 public class PersonServiceImpl implements PersonService {
-
     private final Logger log = LoggerFactory.getLogger(PersonServiceImpl.class);
 
     private final PersonRepository personRepository;
@@ -63,7 +60,6 @@ public class PersonServiceImpl implements PersonService {
         return personRepository.findAll(pageable);
     }
 
-
     @Override
     @Transactional(readOnly = true)
     public Optional<Person> findOne(Long id) {
@@ -77,16 +73,13 @@ public class PersonServiceImpl implements PersonService {
         personRepository.deleteById(id);
     }
 
-
     @Override
     @Transactional(readOnly = true)
     public byte[] createPdfReport() throws JRException {
-
         final JasperPrint print = getJasperPrint();
         // Export the report to a PDF file.
         return JasperExportManager.exportReportToPdf(print);
     }
-
 
     @Override
     @Transactional(readOnly = true)
@@ -95,7 +88,7 @@ public class PersonServiceImpl implements PersonService {
         try (ByteArrayOutputStream xlsReport = new ByteArrayOutputStream()) {
             JRXlsxExporter exporter = new JRXlsxExporter(); // initialize exporter
             exporter.setExporterInput(new SimpleExporterInput(print)); // set compiled report as input
-            exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(xlsReport));  // set output file via path with filename
+            exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(xlsReport)); // set output file via path with filename
             SimpleXlsxReportConfiguration configuration = new SimpleXlsxReportConfiguration();
             configuration.setOnePagePerSheet(true); // setup configuration
             configuration.setDetectCellType(true);
@@ -124,20 +117,22 @@ public class PersonServiceImpl implements PersonService {
         return JasperFillManager.fillReport(report, parameters, source);
     }
 
-    @Scheduled(cron="* */5 * * * ?")
+    // @Scheduled(cron="* */5 * * * ?")
     public void lookupAndSaveNewPerson() {
         List<Person> personList = lookupNewPerson();
         log.debug("Found {} person. Saving.", personList.size());
         personRepository.saveAll(personList);
     }
 
-
     private List<Person> lookupNewPerson() {
         String url = "https://api.mocki.io/v1/b043df5a";
         log.debug("Lookup new people. Call external resource {}", url);
-        ResponseEntity<List<Person>> response = restTemplate.exchange(url, HttpMethod.GET, getHttpEntity(),
-            new ParameterizedTypeReference<List<Person>>() {
-            });
+        ResponseEntity<List<Person>> response = restTemplate.exchange(
+            url,
+            HttpMethod.GET,
+            getHttpEntity(),
+            new ParameterizedTypeReference<List<Person>>() {}
+        );
         return response.getBody();
     }
 
