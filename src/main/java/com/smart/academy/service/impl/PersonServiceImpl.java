@@ -124,7 +124,7 @@ public class PersonServiceImpl implements PersonService {
         return JasperFillManager.fillReport(report, parameters, source);
     }
 
-    @Scheduled(cron="* */5 * * * ?")
+//    @Scheduled(cron="* */5 * * * ?")
     public void lookupAndSaveNewPerson() {
         List<Person> personList = lookupNewPerson();
         log.debug("Found {} person. Saving.", personList.size());
