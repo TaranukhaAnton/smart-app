@@ -15,7 +15,7 @@ import { ProfileService } from 'app/layouts/profiles/profile.service';
 export class NavbarComponent implements OnInit {
   inProduction?: boolean;
   isNavbarCollapsed = true;
-  swaggerEnabled?: boolean;
+
   version: string;
 
   constructor(
@@ -31,7 +31,6 @@ export class NavbarComponent implements OnInit {
   ngOnInit(): void {
     this.profileService.getProfileInfo().subscribe(profileInfo => {
       this.inProduction = profileInfo.inProduction;
-      this.swaggerEnabled = profileInfo.swaggerEnabled;
     });
   }
 

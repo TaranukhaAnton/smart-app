@@ -6,10 +6,5 @@ export interface InfoResponse {
 }
 
 export class ProfileInfo {
-  constructor(
-    public activeProfiles?: string[],
-    public ribbonEnv?: string,
-    public inProduction?: boolean,
-    public swaggerEnabled?: boolean
-  ) {}
+  constructor(public activeProfiles?: string[], public ribbonEnv?: string, public inProduction?: boolean) {}
 }
